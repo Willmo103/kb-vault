@@ -11,17 +11,20 @@ from kb_vault.process import find_obsidian_vaults, scan_and_index_vaults
 
 @pytest.fixture(autouse=True)
 def mock_should_ignore_path(monkeypatch):
-    """Monkeypatch should_ignore_path to prevent skipping pytest temp folders on Windows."""
+    """Monkeypatch should_ignore_path to prevent skipping system temp folders during tests."""
     from kb_core.utils import should_ignore_path as original_should_ignore
+    import tempfile
+
+    temp_dir = Path(tempfile.gettempdir()).resolve()
 
     def fake_should_ignore(path):
-        path_str = Path(path).as_posix()
-        if "pytest-of-Will" in path_str or "AppData/Local/Temp" in path_str:
-            # For testing inside temp dirs, only check standard git/build directories
-            name = Path(path).name
+        resolved_path = Path(path).resolve()
+        if temp_dir in resolved_path.parents or temp_dir == resolved_path:
+            # For testing inside system temp directories, only check standard git/build dirs
+            name = resolved_path.name
             if name in (".git", "node_modules", "__pycache__", ".venv", ".obsidian"):
                 return True
-            if Path(path).suffix.lower() in (".pyc", ".pyo"):
+            if resolved_path.suffix.lower() in (".pyc", ".pyo"):
                 return True
             return False
         return original_should_ignore(path)
