@@ -1,6 +1,6 @@
 [project]
 name = "kb-vault"
-version = "0.1.0"
+version = "0.1.1"
 description = "Obsidian vault markdown scanner and FTS indexer for the kb stack."
 readme = "README.md"
 requires-python = ">=3.13"
