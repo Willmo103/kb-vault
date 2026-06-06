@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - main
   pull_request:
 
 permissions:
@@ -31,11 +32,12 @@ jobs:
 
       - name: Run tests
         run: |
-          uv sync
+          uv sync --upgrade-package kb-core
           uv run pytest
 
       - name: Bump version and push release tag
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -53,8 +55,28 @@ jobs:
           # Tag the release
           git tag "v$NEW_VERSION"
           
-          # Push the commit and the tags back to master
-          git push origin HEAD:master --follow-tags
+          # Push the commit and the tags back to the active branch
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          git push origin HEAD:$BRANCH_NAME
+          git push origin "v$NEW_VERSION"
+
+      - name: Build Python CLI Wheel/sdist
+        shell: bash
+        run: |
+          uv build
+
+      - name: Create GitHub Release
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Fetch version to use in release command
+          NEW_VERSION=$(uv version --short)
           
-          # Create GitHub Release pointing to the new tag
-          gh release create "v$NEW_VERSION" --title "Release v$NEW_VERSION" --notes "Automated release for version v$NEW_VERSION"
+          # Create GitHub Release and upload build artifacts
+          gh release create "v$NEW_VERSION" \
+            --title "Release v$NEW_VERSION" \
+            --notes "Automated release for version v$NEW_VERSION" \
+            dist/*.whl \
+            dist/*.tar.gz

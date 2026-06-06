@@ -143,8 +143,8 @@ wheels = [
 
 [[package]]
 name = "kb-core"
-version = "0.1.7"
-source = { git = "https://github.com/Willmo103/kb-core.git#b31af4426eb84ed10d0aeb38feae968e67ea5c07" }
+version = "0.1.12"
+source = { git = "https://github.com/Willmo103/kb-core.git#5ae85d493e5e27a18fc753955b8ed16cfc6860bf" }
 dependencies = [
     { name = "httpx" },
     { name = "jinja2" },
