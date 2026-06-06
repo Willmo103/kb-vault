@@ -143,8 +143,8 @@ wheels = [
 
 [[package]]
 name = "kb-core"
-version = "0.1.12"
-source = { git = "https://github.com/Willmo103/kb-core.git#5ae85d493e5e27a18fc753955b8ed16cfc6860bf" }
+version = "0.1.13"
+source = { git = "https://github.com/Willmo103/kb-core.git#6d972df948806ab5009d9320275f3da6feef4b6f" }
 dependencies = [
     { name = "httpx" },
     { name = "jinja2" },
@@ -154,7 +154,7 @@ dependencies = [
 
 [[package]]
 name = "kb-vault"
-version = "0.1.1"
+version = "0.1.2"
 source = { editable = "." }
 dependencies = [
     { name = "kb-core" },
